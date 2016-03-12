@@ -1,0 +1,32 @@
+* google-search
+  search the internet using google or bing(default).
+  Of course, you can customize it.
+
+* INSTALL
+  - git clone
+  - /in emacs/ eval:
+    #+BEGIN_SRC emacs-lisp
+(package-install-file "/path/to/google-search/google-search.el")
+    #+END_SRC
+
+* Variables
+** google-search//search-engine
+   default:  
+   #+BEGIN_SRC emacs-lisp
+'(("bing" . "<url-for-searching>")
+  ("google" . "<url-for-searching>"))
+   #+END_SRC
+
+   the first elem (default *bing*) used as default search engine.
+   add 
+   #+BEGIN_SRC emacs-lisp
+("engine name" . "<url-for-searching>")
+   #+END_SRC
+   to this variable to customize.
+
+* keymap
+  M-x google-search => search <something> using default search engine.
+  C-u M-x google-search => search <something> using selected search engine.
+
+* Package Requires
+  - Ivy
