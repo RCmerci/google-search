@@ -26,6 +26,7 @@
 
 * keymap
   M-x google-search => search <something> using default search engine.
+
   C-u M-x google-search => search <something> using selected search engine.
 
 * Package Requires
