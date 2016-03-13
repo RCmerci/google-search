@@ -5,7 +5,7 @@
 ;; Author: rcmerci <rcmerci@rcmercis-rmbp.local>
 ;; Keywords: hypermedia
 ;; Package-Requires: ((emacs "24.4") (swiper "20160124.429"))
-;; Version: 20160312.1
+;; Version: 20160314.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@
       (caar google-search//search-engines))))
   
   (let ((striped-request (replace-regexp-in-string "\\(^[[:space:]]*\\)\\|\\([[:space:]]*$\\)" "" request))) ;strip spaces
+    (if (cl-equalp "" striped-request)
+	(user-error "empty content for searching."))
     (google-search//update-search-history striped-request)
     (browse-url (format (cdr (assoc search-engine google-search//search-engines)) striped-request))))
 
