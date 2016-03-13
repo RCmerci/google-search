@@ -55,11 +55,18 @@
 	(ivy-read "search engine: " google-search//search-engines :require-match t)
       (caar google-search//search-engines))))
   
-  (let ((striped-request (replace-regexp-in-string "\\(^[[:space:]]*\\)\\|\\([[:space:]]*$\\)" "" request))) ;strip spaces
+  (let ((striped-request
+	 (replace-regexp-in-string "\\(^[[:space:]]*\\)\\|\\([[:space:]]*$\\)" ""
+				   (replace-regexp-in-string "\n" " " request)))) ;strip spaces
     (if (cl-equalp "" striped-request)
 	(user-error "empty content for searching."))
     (google-search//update-search-history striped-request)
-    (browse-url (format (cdr (assoc search-engine google-search//search-engines)) striped-request))))
+    (browse-url (format (cdr (assoc search-engine google-search//search-engines)) striped-request))
+
+    ;; if region is active, deactive it.
+    ;; see also `region-active-p`, here should use `use-region-p`.
+    (if (use-region-p)
+	(deactivate-mark))))
 
 (defun google-search//update-search-history (request)
   (setq google-search//search-history (cl-delete request google-search//search-history :test 'equal))
