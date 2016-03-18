@@ -55,20 +55,28 @@
 	(ivy-read "search engine: " google-search//search-engines :require-match t)
       (caar google-search//search-engines))))
   
-  (let* ((stripped-request
-	 
-	 (replace-regexp-in-string "\\(^[[:space:]]*\\)\\|\\([[:space:]]*$\\)" ""
-				   (replace-regexp-in-string "\n" " " request)))
-	 (no-space-request (replace-regexp-in-string "[[:space:]]+" "+" stripped-request)))
-    (if (cl-equalp "" stripped-request)
-	(user-error "empty content for searching."))
-    (google-search//update-search-history stripped-request)
-    (browse-url (format (cdr (assoc search-engine google-search//search-engines)) no-space-request))
+  (let ((strs (google-search//generate-request-string request)))
+    (google-search//update-search-history (car strs))
+    (browse-url (format (cdr (assoc search-engine google-search//search-engines)) (cdr strs)))
 
     ;; if region is active, deactive it.
     ;; see also `region-active-p`, here should use `use-region-p`.
     (if (use-region-p)
 	(deactivate-mark))))
+
+(defun google-search//generate-request-string (request)
+  "translate request string into two string,
+one as the parameter of `browse-url`,
+another one is stored in `google-search//search-history`."
+  (let* ((store-str
+	  (replace-regexp-in-string "\\(^[[:space:]]*\\)\\|\\([[:space:]]*$\\)" ""
+				    (replace-regexp-in-string "\n" " " request)))
+	 (search-str
+	  (url-encode-url (replace-regexp-in-string "[[:space:]]+" "+" store-str))))
+    (when (cl-equalp "" store-str)
+      (user-error "empty content for searching."))
+    `(,store-str . ,search-str)))
+
 
 (defun google-search//update-search-history (request)
   (setq google-search//search-history (cl-delete request google-search//search-history :test 'equal))
@@ -80,7 +88,7 @@
 (defun google-search//save-recent-search-history ()
   "保存 `google-search//search-history` 到 `google-search//search-history-file`. "
   ;; make sure it exists.
-  (if (not (file-exists-p google-search//search-history-file))
+  (unless  (file-exists-p google-search//search-history-file)
       (write-region "" nil google-search//search-history-file))
   
   (if (and (file-readable-p google-search//search-history-file)
